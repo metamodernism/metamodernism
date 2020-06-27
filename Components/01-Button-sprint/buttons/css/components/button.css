@@ -1,0 +1,38 @@
+/* Your button CSS file */
+
+.btn-medium {
+color: rgba(10,10,10,0.2);
+border: solid rgba(10,10,10,0.3) 0.5px;
+border-radius: 20px;
+padding: 10px 20px;
+}
+
+.btn-medium:hover {
+color: rgba(10,10,10,0.4);
+border: solid rgba(10,10,10,0.6) 0.5px;
+
+}
+
+.btn-treehouse {
+background-color: #49f2a1;
+color:#ffffff;
+font-weight: bold;
+border-radius: 5px;
+padding: 10px 20px;
+}
+
+.btn-yours {
+border: solid white 0.75px;
+color: white;
+background-image: linear-gradient(to right, #fbc2eb 0%, #a6c1ee 100%);
+padding: 10px 20px;
+border-radius: 5px;
+text-transform: uppercase;
+transition: 0.3s;
+
+}
+
+.btn-yours:hover {
+  border: solid blue 0.75px;
+  background-image: linear-gradient(to left, #fbc2eb 0%, #a6c1ee 100%);
+}
