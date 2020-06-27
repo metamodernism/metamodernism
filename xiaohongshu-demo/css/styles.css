@@ -1,0 +1,92 @@
+/* --- Font imports --- */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto+Mono:wght@100&display=swap');
+@import url("https://use.fontawesome.com/releases/v5.6.3/css/all.css");
+
+/* --- Component imports --- */
+@import url("components/container.css");
+@import url("components/allofthe.css");
+
+/* Masonry on large screens */
+@media only screen and (min-width: 1024px) {
+  .masonry {
+    column-count: 4;
+
+  }
+}
+
+.item-title, .fav {
+  font-size: 15px;
+
+  }
+
+.author-name {
+  font-size:7px;
+
+
+  }
+}
+
+
+/* Masonry on medium-sized screens */
+@media only screen and (max-width: 1023px) and (min-width: 768px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+.item-title, .fav {
+  font-size: 15px;
+}
+
+.author-name {
+  font-size:7px;
+
+
+  }
+}
+
+/* Masonry on small screens */
+@media only screen and (max-width: 767px) and (min-width: 540px) {
+  .masonry {
+    column-count: 2;
+  }
+  .item-title, .fav {
+    font-size: 15px;
+  }
+
+  .author-name {
+    font-size: 7px;
+  }
+}
+
+
+/* Masonry on mini screens */
+@media only screen and (max-width: 540px) and (min-width: 250px) {
+   .masonry {
+    column-count: 1;
+  }
+  .item-title, .fav {
+    font-size: 15px;
+  }
+
+  .author-name {
+    font-size: 7px;
+  }
+}
+
+
+
+/* --- Fonts & colors --- */
+body {
+  background-color: rgb(245,245,245);
+  font-family: "Roboto Mono", "Helvetica", "sans-serif";
+  margin: 0;
+}
+h1, h2 {
+  font-family: "Bebas Neue", "sans-serif";
+}
+
+}
+h3 {
+  font-family: "Roboto Mono", "sans-serif";
+}
