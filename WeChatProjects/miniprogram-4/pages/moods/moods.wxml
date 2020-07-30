@@ -1,0 +1,16 @@
+<!--pages/moods/moods.wxml-->
+
+<view class="page__container">
+<view wx:if="{{!moods || !moods.length}}">none</view> 
+<view wx:else >
+    <view wx:for="{{moods}}" class="card-product">
+        <view class="card-product-infos">
+        <text class="h2">{{item.content}}</text>
+        <text class="product-description">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- stories.wxml -->
+<button bindtap="clickMe">{{text}}</button>

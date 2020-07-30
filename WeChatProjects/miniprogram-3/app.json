@@ -1,0 +1,30 @@
+{
+  "pages":[
+    "pages/landing/landing",
+    "pages/logs/logs",
+    "pages/stories/stories",
+    "pages/post/post"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#000",
+    "navigationBarTitleText": "FMC",
+    "navigationBarTextStyle":"white"
+  },
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/stories/stories",
+        "text": "Stories",
+        "iconPath": "/images/stories.png",
+        "selectedIconPath": "/images/stories.png"
+      },
+      {
+        "pagePath": "pages/post/post",
+        "text": "Post",
+        "iconPath": "/images/post.png",
+        "selectedIconPath": "/images/post.png"
+      }
+    ]
+  }
+}

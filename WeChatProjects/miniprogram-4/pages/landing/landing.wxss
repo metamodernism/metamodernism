@@ -1,0 +1,60 @@
+/* pages/landing/landing.wxss */
+
+.page__container {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 5vw;
+  box-sizing: border-box;
+  position: relative;
+
+  /* Change this to change background color */
+  background: linear-gradient(#2a0845, #6441A5);
+  
+}
+
+.image {
+  height: 150px;
+  width: 150px;
+  margin-top: 15%;
+  background: url('https://assets.website-files.com/5c7b9ec7ee8807807ab92da7/5eef02a5154958815c03f7ba_Metaverse-p-1080.jpeg');
+
+  background-size: cover;
+}
+
+.header {
+  margin-top: 5%;
+  font-size: 36px;
+  font-weight: bold;
+  color: #F2F2F2;
+}
+
+.subheader {
+  margin-top: 1%;
+  font-size: 16px;
+  color: #F2F2F2;
+}
+
+.btn {
+  width: 80% !important;
+  height: 50px !important;
+  position: absolute;
+  bottom: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #5a3b95, #6b46b1);
+  box-shadow:  25px 25px 51px #55378c, 
+             -25px -25px 51px #734bbe;
+  transition: all 1s linear;
+  color: #fafafa;
+  text-transform: uppercase;
+  font-family: Arial, Helvetica, sans-serif;
+ 
+}
+
+.hover {
+  box-shadow: -1px 1px 10px rgba(0,0,0,0.5);
+}

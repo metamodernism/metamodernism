@@ -1,0 +1,4 @@
+<!-- user.wxml -->
+<image class="avatar" src="{{currentUser.photo || currentUser.avatar}}" />
+<button type="primary" open-type="getUserInfo" bindgetuserinfo="userInfoHandler">Login</button>
+

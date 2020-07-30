@@ -1,0 +1,11 @@
+<!--pages/landing/landing.wxml-->
+
+<view class="banner" style="padding-top:20px; height: 100vh; background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/background.png);">
+  <view class="container">
+    <view class="h1">{{title}}</view>
+    <view class="p">{{description}}</view>
+    <button class="btn btn-flat" bindtap="goToStories">
+      {{cta}}
+    </button>
+  </view>
+</view>

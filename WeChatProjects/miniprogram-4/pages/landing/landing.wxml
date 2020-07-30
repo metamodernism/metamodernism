@@ -1,0 +1,11 @@
+<!--pages/landing/landing.wxml-->
+
+<view class="page__container">
+  <view class="image"></view>
+  <view class="header">{{title}}</view>
+  <view class="subheader">{{description}}</view>
+  <button hover-class="hover" class="btn"url="#" bindtap="goToMoodsPage">{{cta}}</button>
+</view>
+
+<!-- stories.wxml -->
+

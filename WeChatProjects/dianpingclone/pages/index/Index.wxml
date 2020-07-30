@@ -1,0 +1,11 @@
+<!--pages/index/Index.wxml-->
+<view wx:for="{{restaurants}}" wx:for-item="restaurant" class="card-product">
+ <view bindtap="showRestaurant" data-id="{{restaurant.id}}"> 
+    <view class="card-product-infos">
+      <image class="card-image" src="{{restaurant.photo}}"/>
+      <view class="h2">{{restaurant.name}}</view>
+      <view class="p">{{restaurant.description}}</view>
+    </view>
+  </view>
+</view>
+

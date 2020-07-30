@@ -1,0 +1,14 @@
+<!--pages/stories/stories.wxml-->
+<view class="banner" style="padding:20px 0px; height: 100px; background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(https://raw.githubusercontent.com/lewagon/fullstack-images/master/uikit/background.png);">
+    <view class="h1">F*** my code</view>
+    <view class="p">{{tagline}}</view>
+</view>
+
+<!-- FMC STORY -->
+
+<view class="card-product">
+  <view class="card-product-infos">
+    <view class="h2">{{content}}</view>
+    <view class="p">{{name}}</view>
+  </view>
+</view>

@@ -1,0 +1,15 @@
+<!--pages/post/post.wxml-->
+<form bindsubmit="formSubmit" bindreset="formReset">
+   <view class="section">
+    <view class="section__title">Name</view>
+    <input name="input" placeholder="Your name" />
+  </view>
+   <view class="section">
+    <view class="section_title">Story</view>
+    <input name="input" placeholder="Your story" />
+  </view>
+  <view class="btn-area">
+    <button form-type="submit">Submit</button>
+    <button form-type="reset">Reset</button>
+  </view>
+</form>

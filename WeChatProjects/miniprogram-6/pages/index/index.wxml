@@ -1,0 +1,13 @@
+<!--pages/stories/stories.wxml-->
+<view class="banner" style="padding:20px 0px; height: 100px; background-image: linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.4)), url(/images/the-day-today.jpg">
+    <view class="h1"></view>
+    <view class="p">{{tagline}}</view>
+</view>
+<!-- FMC STORY -->
+<view wx:for="{{stories}}" wx:for-item="story" class="card-product">
+  <view class="card-product-infos">
+    <view class="h2">{{story.content}}</view>
+    <view class="p">{{story.name}}</view>
+    <view data-id= "{{story.id}}" bindtap="showStory">{{index + 1}}</view>
+  </view>
+</view>

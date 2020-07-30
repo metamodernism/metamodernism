@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "pages/index/Index",
+    "pages/Restaurant/Index",
+    "pages/Restaurant/Detail",
+    "pages/User/User"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "plugins": {
+    "sdkPlugin": {
+      "version": "3.3.0",
+      "provider": "wxc6b86e382a1e3294"
+    }
+  },
+
+"tabBar":{
+  "list":[
+    {
+      "pagePath":"pages/index/Index",
+      "text":"Restaurants"
+      
+    },
+    {
+      "pagePath":"pages/User/User",
+      "text":"Profile"
+    }
+  ]
+}
+}

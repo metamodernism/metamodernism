@@ -1,0 +1,28 @@
+<!--pages/Restaurant/Detail.wxml-->
+<view class="card-product">
+  <view class="card-product-infos">
+      <image class="card-image" src="{{restaurants.photo}}"/>
+      <view class="h2">{{restaurants.name}}</view>
+      <view class="p">{{restaurants.description}}</view>
+  </view>
+</view>
+
+<view wx:for="{{reviews}}" wx:for-item="review" wx:key="id" class="card-product">
+    <view class="card-product-infos">
+      <view class="h2">{{review.rating}}</view>
+      <view class="p">{{review.content}}</view>
+    </view>
+
+    <form bindsubmit="createReview" wx:if="{{currentUser}}"> 
+      <view class="review-input">
+        <input placeholder="Leave your review here" name="content"></input>
+          <picker mode="selector" range="{{ratings}}" onchange="onRate">
+            restaurant Rating: {{rating}}
+          </picker>
+        </view>
+        <view class="submit-button"> 
+          <button type="primary" form-type="submit" bindgetuserinfo="userInfoHandler">submit</button>
+        </view>  
+    </form>
+</view>
+

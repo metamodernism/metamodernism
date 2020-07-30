@@ -1,0 +1,17 @@
+<view class="card-product">
+  <view class="card-product-infos">
+    <view class="h2">{{story.content}}</view>
+    <view class="p">{{story.name}}</view>
+  </view>
+</view>
+<view wx:for="{{comments}}" wx:for-item="comment" class="card-product">
+  <view class="card-product-infos">
+    <view class="h2">{{comment.content}}</view>
+    <view class="p">{{comment.name}}</view>
+    <button bindtap="clickMe">delete</button>
+    <view> {{comment.content}}
+  <view data-id="{{comment.id}}" bindtap="deleteComment" > Delete Comment </view>
+</view>
+  </view>
+</view>
+
