@@ -52,18 +52,8 @@
 <body>
   <div id="canvas-container"></div>
 
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
-
-  <script type="module">
-    import * as THREE from 'three';
-
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script>
     // ── Setup ──────────────────────────────────────────────
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
@@ -87,11 +77,11 @@
 
     // ── Helpers ────────────────────────────────────────────
 
-    /** Return the 2D positions of a regular hexagon (flat-top). */
-    function hexagonVertices(radius, count = NUM_VERTICES) {
-      const verts = [];
-      for (let i = 0; i < count; i++) {
-        const angle = (Math.PI / 3) * i - Math.PI / 6; // flat-top orientation
+    function hexagonVertices(radius, count) {
+      count = count || NUM_VERTICES;
+      var verts = [];
+      for (var i = 0; i < count; i++) {
+        var angle = (Math.PI / 3) * i - Math.PI / 6;
         verts.push(new THREE.Vector3(
           Math.cos(angle) * radius,
           Math.sin(angle) * radius,
@@ -101,14 +91,12 @@
       return verts;
     }
 
-    /** Create a dotted-line loop from an array of Vector3. */
     function createDottedLoop(vertices, color, dashSize, gapSize) {
-      const points = [...vertices, vertices[0]]; // close the loop
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      var points = vertices.concat([vertices[0]]);
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-      // Compute distances for dash pattern
-      const distances = [0];
-      for (let i = 1; i < points.length; i++) {
+      var distances = [0];
+      for (var i = 1; i < points.length; i++) {
         distances.push(distances[i - 1] + points[i].distanceTo(points[i - 1]));
       }
       geometry.setAttribute(
@@ -116,70 +104,68 @@
         new THREE.Float32BufferAttribute(distances, 1)
       );
 
-      const material = new THREE.LineDashedMaterial({
-        color,
-        dashSize,
-        gapSize,
+      var material = new THREE.LineDashedMaterial({
+        color: color,
+        dashSize: dashSize,
+        gapSize: gapSize,
         transparent: true,
         opacity: 1.0,
       });
 
-      const line = new THREE.Line(geometry, material);
+      var line = new THREE.Line(geometry, material);
       line.computeLineDistances();
       return line;
     }
 
-    /** Create a circle outline from segments. */
-    function createCircle(radius, segments, color, dashed = false) {
-      const points = [];
-      for (let i = 0; i <= segments; i++) {
-        const a = (i / segments) * Math.PI * 2;
+    function createCircle(radius, segments, color, dashed) {
+      var points = [];
+      for (var i = 0; i <= segments; i++) {
+        var a = (i / segments) * Math.PI * 2;
         points.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
       }
 
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
 
       if (dashed) {
-        const distances = [0];
-        for (let i = 1; i < points.length; i++) {
+        var distances = [0];
+        for (var i = 1; i < points.length; i++) {
           distances.push(distances[i - 1] + points[i].distanceTo(points[i - 1]));
         }
         geometry.setAttribute('lineDistance', new THREE.Float32BufferAttribute(distances, 1));
 
-        const material = new THREE.LineDashedMaterial({
-          color,
+        var material = new THREE.LineDashedMaterial({
+          color: color,
           dashSize: 0.04,
           gapSize: 0.06,
           transparent: true,
           opacity: 0.7,
         });
-        const line = new THREE.Line(geometry, material);
+        var line = new THREE.Line(geometry, material);
         line.computeLineDistances();
         return line;
       }
 
-      const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 });
+      var material = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.9 });
       return new THREE.Line(geometry, material);
     }
 
-    /** Create a smooth spline between two points, curving through center influence. */
-    function createSpline(start, end, color, opacity = 0.5) {
-      const mid = new THREE.Vector3()
+    function createSpline(start, end, color, opacity) {
+      opacity = opacity || 0.5;
+      var mid = new THREE.Vector3()
         .addVectors(start, end)
         .multiplyScalar(0.5);
 
-      // Pull midpoint toward center for curvature
-      const pull = 0.35;
+      var pull = 0.35;
       mid.multiplyScalar(1 - pull);
 
-      const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-      const points = curve.getPoints(48);
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      var curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+      var points = curve.getPoints(48);
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-      const material = new THREE.LineBasicMaterial({
-        color,
+      var material = new THREE.LineBasicMaterial({
+        color: color,
         transparent: true,
-        opacity,
+        opacity: opacity,
       });
 
       return new THREE.Line(geometry, material);
@@ -187,36 +173,34 @@
 
     // ── Build Scene ────────────────────────────────────────
 
-    const diagramGroup = new THREE.Group();
+    var diagramGroup = new THREE.Group();
     scene.add(diagramGroup);
 
     // Outer hexagon (dotted)
-    const outerVerts = hexagonVertices(OUTER_RADIUS);
-    const outerHex = createDottedLoop(outerVerts, LINE_COLOR, DASH_SCALE, DOT_GAP);
+    var outerVerts = hexagonVertices(OUTER_RADIUS);
+    var outerHex = createDottedLoop(outerVerts, LINE_COLOR, DASH_SCALE, DOT_GAP);
     diagramGroup.add(outerHex);
 
     // Inner hexagon (dotted, subtler)
-    const innerVerts = hexagonVertices(INNER_RADIUS);
-    const innerHex = createDottedLoop(innerVerts, LINE_COLOR, DASH_SCALE * 0.7, DOT_GAP * 0.8);
+    var innerVerts = hexagonVertices(INNER_RADIUS);
+    var innerHex = createDottedLoop(innerVerts, LINE_COLOR, DASH_SCALE * 0.7, DOT_GAP * 0.8);
     innerHex.material.opacity = 0.45;
     diagramGroup.add(innerHex);
 
-    // Five axis lines — from outer vertex through center to opposite outer edge
-    const axisLines = [];
-    for (let i = 0; i < NUM_AXES; i++) {
-      const from = outerVerts[i];
-      // Opposite point: offset by 3 vertices on a hexagon, but since we have 5 axes
-      // we draw from vertex i to the midpoint of the opposite edge
-      const oppIdx = (i + 3) % NUM_VERTICES;
-      const to = outerVerts[oppIdx];
+    // Five axis lines
+    var axisLines = [];
+    for (var i = 0; i < NUM_AXES; i++) {
+      var from = outerVerts[i];
+      var oppIdx = (i + 3) % NUM_VERTICES;
+      var to = outerVerts[oppIdx];
 
-      const points = [from, to];
-      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      var points = [from, to];
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
 
-      const distances = [0, from.distanceTo(to)];
+      var distances = [0, from.distanceTo(to)];
       geometry.setAttribute('lineDistance', new THREE.Float32BufferAttribute(distances, 1));
 
-      const material = new THREE.LineDashedMaterial({
+      var material = new THREE.LineDashedMaterial({
         color: DIM_COLOR,
         dashSize: 0.05,
         gapSize: 0.08,
@@ -224,59 +208,59 @@
         opacity: 0.3,
       });
 
-      const line = new THREE.Line(geometry, material);
+      var line = new THREE.Line(geometry, material);
       line.computeLineDistances();
       axisLines.push(line);
       diagramGroup.add(line);
     }
 
-    // Internal splines — connect inner hexagon vertices with curved lines
-    const splines = [];
-    for (let i = 0; i < NUM_AXES; i++) {
-      const a = innerVerts[i];
-      const b = innerVerts[(i + 2) % NUM_VERTICES];
-      const spline = createSpline(a, b, LINE_COLOR, 0.25);
+    // Internal splines
+    var splines = [];
+    for (var i = 0; i < NUM_AXES; i++) {
+      var a = innerVerts[i];
+      var b = innerVerts[(i + 2) % NUM_VERTICES];
+      var spline = createSpline(a, b, LINE_COLOR, 0.25);
       splines.push(spline);
       diagramGroup.add(spline);
     }
 
-    // Additional cross-splines for density
-    for (let i = 0; i < NUM_AXES; i++) {
-      const a = innerVerts[i];
-      const b = innerVerts[(i + 3) % NUM_VERTICES];
-      const spline = createSpline(a, b, LINE_COLOR, 0.15);
+    // Additional cross-splines
+    for (var i = 0; i < NUM_AXES; i++) {
+      var a = innerVerts[i];
+      var b = innerVerts[(i + 3) % NUM_VERTICES];
+      var spline = createSpline(a, b, LINE_COLOR, 0.15);
       splines.push(spline);
       diagramGroup.add(spline);
     }
 
     // Central circle
-    const centerCircle = createCircle(CENTER_RADIUS, 64, LINE_COLOR, false);
+    var centerCircle = createCircle(CENTER_RADIUS, 64, LINE_COLOR, false);
     diagramGroup.add(centerCircle);
 
     // Smaller inner ring (dashed)
-    const innerRing = createCircle(CENTER_RADIUS * 0.55, 48, LINE_COLOR, true);
+    var innerRing = createCircle(CENTER_RADIUS * 0.55, 48, LINE_COLOR, true);
     diagramGroup.add(innerRing);
 
     // Vertex dots on outer hexagon
-    const dotGeometry = new THREE.CircleGeometry(0.045, 16);
-    const dotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR });
-    outerVerts.forEach((v) => {
-      const dot = new THREE.Mesh(dotGeometry, dotMaterial);
+    var dotGeometry = new THREE.CircleGeometry(0.045, 16);
+    var dotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR });
+    outerVerts.forEach(function(v) {
+      var dot = new THREE.Mesh(dotGeometry, dotMaterial);
       dot.position.copy(v);
       diagramGroup.add(dot);
     });
 
     // Vertex dots on inner hexagon (smaller)
-    const smallDotGeometry = new THREE.CircleGeometry(0.03, 16);
-    const smallDotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR, transparent: true, opacity: 0.6 });
-    innerVerts.forEach((v) => {
-      const dot = new THREE.Mesh(smallDotGeometry, smallDotMaterial);
+    var smallDotGeometry = new THREE.CircleGeometry(0.03, 16);
+    var smallDotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR, transparent: true, opacity: 0.6 });
+    innerVerts.forEach(function(v) {
+      var dot = new THREE.Mesh(smallDotGeometry, smallDotMaterial);
       dot.position.copy(v);
       diagramGroup.add(dot);
     });
 
     // Center dot
-    const centerDot = new THREE.Mesh(
+    var centerDot = new THREE.Mesh(
       new THREE.CircleGeometry(0.06, 24),
       new THREE.MeshBasicMaterial({ color: LINE_COLOR })
     );
@@ -284,41 +268,34 @@
 
     // ── Animation ──────────────────────────────────────────
 
-    const clock = new THREE.Clock();
+    var clock = new THREE.Clock();
 
     function animate() {
       requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
+      var t = clock.getElapsedTime();
 
-      // Slow rotation of the whole diagram
       diagramGroup.rotation.z = Math.sin(t * 0.15) * 0.04;
 
-      // Pulse the outer hexagon opacity
       outerHex.material.opacity = 0.7 + Math.sin(t * 0.8) * 0.3;
 
-      // Gentle breathing on inner hexagon
-      const innerScale = 1.0 + Math.sin(t * 0.6) * 0.02;
+      var innerScale = 1.0 + Math.sin(t * 0.6) * 0.02;
       innerHex.scale.set(innerScale, innerScale, 1);
       innerHex.material.opacity = 0.35 + Math.sin(t * 0.5 + 1) * 0.15;
 
-      // Animate spline opacities
-      splines.forEach((spline, i) => {
-        const phase = (i / splines.length) * Math.PI * 2;
+      splines.forEach(function(spline, i) {
+        var phase = (i / splines.length) * Math.PI * 2;
         spline.material.opacity = 0.12 + Math.sin(t * 0.7 + phase) * 0.12;
       });
 
-      // Animate axis line opacities
-      axisLines.forEach((line, i) => {
-        const phase = (i / axisLines.length) * Math.PI * 2;
+      axisLines.forEach(function(line, i) {
+        var phase = (i / axisLines.length) * Math.PI * 2;
         line.material.opacity = 0.2 + Math.sin(t * 0.4 + phase) * 0.12;
       });
 
-      // Pulse center circle
-      const cScale = 1.0 + Math.sin(t * 1.0) * 0.03;
+      var cScale = 1.0 + Math.sin(t * 1.0) * 0.03;
       centerCircle.scale.set(cScale, cScale, 1);
       centerCircle.material.opacity = 0.7 + Math.sin(t * 1.2) * 0.3;
 
-      // Counter-rotate inner ring
       innerRing.rotation.z = -t * 0.3;
 
       renderer.render(scene, camera);
@@ -327,12 +304,12 @@
     // ── Resize ─────────────────────────────────────────────
 
     function onResize() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
+      var w = window.innerWidth;
+      var h = window.innerHeight;
       renderer.setSize(w, h);
 
-      const aspect = w / h;
-      const viewSize = 5;
+      var aspect = w / h;
+      var viewSize = 5;
 
       camera.left = -viewSize * aspect;
       camera.right = viewSize * aspect;
