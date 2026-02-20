@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hexagon Diagram</title>
+  <title>Metamodernism Diagram — Animated</title>
   <style>
     @font-face {
       font-family: 'Geist';
@@ -12,317 +12,144 @@
     }
     @font-face {
       font-family: 'Geist';
-      src: url('https://cdn.jsdelivr.net/npm/geist@1.2.2/dist/fonts/geist-sans/Geist-Light.woff2') format('woff2');
-      font-weight: 300;
-    }
-    @font-face {
-      font-family: 'GT America Mono';
-      src: url('https://cdn.jsdelivr.net/npm/gt-america-mono@0.1.0/GT-America-Mono-Regular.woff2') format('woff2');
-      font-weight: 400;
+      src: url('https://cdn.jsdelivr.net/npm/geist@1.2.2/dist/fonts/geist-sans/Geist-Bold.woff2') format('woff2');
+      font-weight: 700;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #000;
-      color: #fff;
-      font-family: 'Geist', 'Helvetica Neue', sans-serif;
+      background: #0e0e0e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
       overflow: hidden;
-      width: 100vw;
-      height: 100vh;
     }
 
-    #canvas-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+    svg {
+      width: 100vmin;
+      height: 100vmin;
+      max-width: 100vw;
+      max-height: 100vh;
     }
 
-    canvas {
-      display: block;
+    @keyframes spinCW {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .rotating {
+      transform-origin: 600px 600px;
+      animation: spinCW 180s linear infinite;
     }
   </style>
 </head>
 <body>
-  <div id="canvas-container"></div>
+  <svg viewBox="0 0 1200 1200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" viewBox="0 0 12 12" refX="10" refY="6"
+              markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+        <path d="M 2 2 L 10 6 L 2 10" fill="none" stroke="#fff" stroke-width="1.5"
+              stroke-linecap="round" stroke-linejoin="round" />
+      </marker>
+    </defs>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script>
-    // ── Setup ──────────────────────────────────────────────
-    const container = document.getElementById('canvas-container');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    <!-- Background -->
+    <rect width="1200" height="1200" fill="#0e0e0e" />
 
-    const camera = new THREE.OrthographicCamera();
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
+    <!-- ═══ Fixed layer: axes + corner labels ═══ -->
 
-    // ── Constants ──────────────────────────────────────────
-    const OUTER_RADIUS = 3.2;
-    const INNER_RADIUS = 1.8;
-    const CENTER_RADIUS = 0.35;
-    const NUM_VERTICES = 6;
-    const NUM_AXES = 5;
-    const DASH_SCALE = 0.08;
-    const DOT_GAP = 0.12;
-    const LINE_COLOR = 0xffffff;
-    const DIM_COLOR = 0x444444;
+    <!-- Axis lines (dashed, with open-chevron arrows) -->
+    <line x1="65" y1="600" x2="1135" y2="600"
+          stroke="#fff" stroke-width="1" stroke-dasharray="8 6" opacity="0.6"
+          marker-start="url(#arrow)" marker-end="url(#arrow)" />
+    <line x1="600" y1="65" x2="600" y2="1135"
+          stroke="#fff" stroke-width="1" stroke-dasharray="8 6" opacity="0.6"
+          marker-start="url(#arrow)" marker-end="url(#arrow)" />
 
-    // ── Helpers ────────────────────────────────────────────
+    <!-- Corner labels (fixed) -->
+    <text x="80" y="95" fill="#fff"
+          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          letter-spacing="3">PEOPLE</text>
+    <text x="1120" y="95" fill="#fff" text-anchor="end"
+          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          letter-spacing="3">PLACE</text>
+    <text x="80" y="1128" fill="#fff"
+          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          letter-spacing="3">SYMBOLS</text>
+    <text x="1120" y="1128" fill="#fff" text-anchor="end"
+          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          letter-spacing="3">RITUALS</text>
 
-    function hexagonVertices(radius, count) {
-      count = count || NUM_VERTICES;
-      var verts = [];
-      for (var i = 0; i < count; i++) {
-        var angle = (Math.PI / 3) * i - Math.PI / 6;
-        verts.push(new THREE.Vector3(
-          Math.cos(angle) * radius,
-          Math.sin(angle) * radius,
-          0
-        ));
-      }
-      return verts;
-    }
+    <!-- ═══ Rotating layer: circles + inner content ═══ -->
+    <g class="rotating">
 
-    function createDottedLoop(vertices, color, dashSize, gapSize) {
-      var points = vertices.concat([vertices[0]]);
-      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+      <!-- Outer dotted circle -->
+      <circle cx="600" cy="600" r="440" fill="none"
+              stroke="#fff" stroke-width="1.5" stroke-dasharray="2.5 6" opacity="0.7" />
 
-      var distances = [0];
-      for (var i = 1; i < points.length; i++) {
-        distances.push(distances[i - 1] + points[i].distanceTo(points[i - 1]));
-      }
-      geometry.setAttribute(
-        'lineDistance',
-        new THREE.Float32BufferAttribute(distances, 1)
-      );
+      <!-- Inner dashed circle -->
+      <circle cx="600" cy="600" r="280" fill="none"
+              stroke="#fff" stroke-width="1.5" stroke-dasharray="12 8" opacity="0.55" />
 
-      var material = new THREE.LineDashedMaterial({
-        color: color,
-        dashSize: dashSize,
-        gapSize: gapSize,
-        transparent: true,
-        opacity: 1.0,
-      });
+      <!-- ─── Quadrant circles ─── -->
 
-      var line = new THREE.Line(geometry, material);
-      line.computeLineDistances();
-      return line;
-    }
+      <!-- Top-left: Friends as Family (solid stroke) -->
+      <circle cx="370" cy="345" r="118" fill="none"
+              stroke="#fff" stroke-width="2" opacity="0.85" />
+      <text x="370" y="337" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Friends</text>
+      <text x="370" y="371" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">as Family</text>
 
-    function createCircle(radius, segments, color, dashed) {
-      var points = [];
-      for (var i = 0; i <= segments; i++) {
-        var a = (i / segments) * Math.PI * 2;
-        points.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
-      }
+      <!-- Top-right: Home and Away (dashed stroke) -->
+      <circle cx="830" cy="340" r="118" fill="none"
+              stroke="#fff" stroke-width="2" stroke-dasharray="10 7" opacity="0.85" />
+      <text x="830" y="332" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Home</text>
+      <text x="830" y="366" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">and Away</text>
 
-      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+      <!-- Bottom-left: Cultural Feeling (dashed stroke) -->
+      <circle cx="368" cy="860" r="118" fill="none"
+              stroke="#fff" stroke-width="2" stroke-dasharray="10 7" opacity="0.85" />
+      <text x="368" y="852" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Cultural</text>
+      <text x="368" y="886" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Feeling</text>
 
-      if (dashed) {
-        var distances = [0];
-        for (var i = 1; i < points.length; i++) {
-          distances.push(distances[i - 1] + points[i].distanceTo(points[i - 1]));
-        }
-        geometry.setAttribute('lineDistance', new THREE.Float32BufferAttribute(distances, 1));
+      <!-- Bottom-right: Self-Calibration (dotted stroke) -->
+      <circle cx="832" cy="865" r="112" fill="none"
+              stroke="#fff" stroke-width="2" stroke-dasharray="2.5 6" opacity="0.85" />
+      <text x="832" y="857" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="28" font-weight="700">Self-</text>
+      <text x="832" y="889" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="28" font-weight="700">Calibration</text>
 
-        var material = new THREE.LineDashedMaterial({
-          color: color,
-          dashSize: 0.04,
-          gapSize: 0.06,
-          transparent: true,
-          opacity: 0.7,
-        });
-        var line = new THREE.Line(geometry, material);
-        line.computeLineDistances();
-        return line;
-      }
+      <!-- ─── Inner quadrant labels ─── -->
 
-      var material = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.9 });
-      return new THREE.Line(geometry, material);
-    }
+      <text x="465" y="510" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Generational</text>
+      <text x="465" y="540" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">reunion</text>
 
-    function createSpline(start, end, color, opacity) {
-      opacity = opacity || 0.5;
-      var mid = new THREE.Vector3()
-        .addVectors(start, end)
-        .multiplyScalar(0.5);
+      <text x="735" y="510" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Ancestral</text>
+      <text x="735" y="540" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">return</text>
 
-      var pull = 0.35;
-      mid.multiplyScalar(1 - pull);
+      <text x="465" y="690" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Common</text>
+      <text x="465" y="720" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Symbols</text>
 
-      var curve = new THREE.QuadraticBezierCurve3(start, mid, end);
-      var points = curve.getPoints(48);
-      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+      <text x="735" y="690" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Responsible</text>
+      <text x="735" y="720" fill="#fff" text-anchor="middle"
+            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Hosting</text>
 
-      var material = new THREE.LineBasicMaterial({
-        color: color,
-        transparent: true,
-        opacity: opacity,
-      });
-
-      return new THREE.Line(geometry, material);
-    }
-
-    // ── Build Scene ────────────────────────────────────────
-
-    var diagramGroup = new THREE.Group();
-    scene.add(diagramGroup);
-
-    // Outer hexagon (dotted)
-    var outerVerts = hexagonVertices(OUTER_RADIUS);
-    var outerHex = createDottedLoop(outerVerts, LINE_COLOR, DASH_SCALE, DOT_GAP);
-    diagramGroup.add(outerHex);
-
-    // Inner hexagon (dotted, subtler)
-    var innerVerts = hexagonVertices(INNER_RADIUS);
-    var innerHex = createDottedLoop(innerVerts, LINE_COLOR, DASH_SCALE * 0.7, DOT_GAP * 0.8);
-    innerHex.material.opacity = 0.45;
-    diagramGroup.add(innerHex);
-
-    // Five axis lines
-    var axisLines = [];
-    for (var i = 0; i < NUM_AXES; i++) {
-      var from = outerVerts[i];
-      var oppIdx = (i + 3) % NUM_VERTICES;
-      var to = outerVerts[oppIdx];
-
-      var points = [from, to];
-      var geometry = new THREE.BufferGeometry().setFromPoints(points);
-
-      var distances = [0, from.distanceTo(to)];
-      geometry.setAttribute('lineDistance', new THREE.Float32BufferAttribute(distances, 1));
-
-      var material = new THREE.LineDashedMaterial({
-        color: DIM_COLOR,
-        dashSize: 0.05,
-        gapSize: 0.08,
-        transparent: true,
-        opacity: 0.3,
-      });
-
-      var line = new THREE.Line(geometry, material);
-      line.computeLineDistances();
-      axisLines.push(line);
-      diagramGroup.add(line);
-    }
-
-    // Internal splines
-    var splines = [];
-    for (var i = 0; i < NUM_AXES; i++) {
-      var a = innerVerts[i];
-      var b = innerVerts[(i + 2) % NUM_VERTICES];
-      var spline = createSpline(a, b, LINE_COLOR, 0.25);
-      splines.push(spline);
-      diagramGroup.add(spline);
-    }
-
-    // Additional cross-splines
-    for (var i = 0; i < NUM_AXES; i++) {
-      var a = innerVerts[i];
-      var b = innerVerts[(i + 3) % NUM_VERTICES];
-      var spline = createSpline(a, b, LINE_COLOR, 0.15);
-      splines.push(spline);
-      diagramGroup.add(spline);
-    }
-
-    // Central circle
-    var centerCircle = createCircle(CENTER_RADIUS, 64, LINE_COLOR, false);
-    diagramGroup.add(centerCircle);
-
-    // Smaller inner ring (dashed)
-    var innerRing = createCircle(CENTER_RADIUS * 0.55, 48, LINE_COLOR, true);
-    diagramGroup.add(innerRing);
-
-    // Vertex dots on outer hexagon
-    var dotGeometry = new THREE.CircleGeometry(0.045, 16);
-    var dotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR });
-    outerVerts.forEach(function(v) {
-      var dot = new THREE.Mesh(dotGeometry, dotMaterial);
-      dot.position.copy(v);
-      diagramGroup.add(dot);
-    });
-
-    // Vertex dots on inner hexagon (smaller)
-    var smallDotGeometry = new THREE.CircleGeometry(0.03, 16);
-    var smallDotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR, transparent: true, opacity: 0.6 });
-    innerVerts.forEach(function(v) {
-      var dot = new THREE.Mesh(smallDotGeometry, smallDotMaterial);
-      dot.position.copy(v);
-      diagramGroup.add(dot);
-    });
-
-    // Center dot
-    var centerDot = new THREE.Mesh(
-      new THREE.CircleGeometry(0.06, 24),
-      new THREE.MeshBasicMaterial({ color: LINE_COLOR })
-    );
-    diagramGroup.add(centerDot);
-
-    // ── Animation ──────────────────────────────────────────
-
-    var clock = new THREE.Clock();
-
-    function animate() {
-      requestAnimationFrame(animate);
-      var t = clock.getElapsedTime();
-
-      diagramGroup.rotation.z = Math.sin(t * 0.15) * 0.04;
-
-      outerHex.material.opacity = 0.7 + Math.sin(t * 0.8) * 0.3;
-
-      var innerScale = 1.0 + Math.sin(t * 0.6) * 0.02;
-      innerHex.scale.set(innerScale, innerScale, 1);
-      innerHex.material.opacity = 0.35 + Math.sin(t * 0.5 + 1) * 0.15;
-
-      splines.forEach(function(spline, i) {
-        var phase = (i / splines.length) * Math.PI * 2;
-        spline.material.opacity = 0.12 + Math.sin(t * 0.7 + phase) * 0.12;
-      });
-
-      axisLines.forEach(function(line, i) {
-        var phase = (i / axisLines.length) * Math.PI * 2;
-        line.material.opacity = 0.2 + Math.sin(t * 0.4 + phase) * 0.12;
-      });
-
-      var cScale = 1.0 + Math.sin(t * 1.0) * 0.03;
-      centerCircle.scale.set(cScale, cScale, 1);
-      centerCircle.material.opacity = 0.7 + Math.sin(t * 1.2) * 0.3;
-
-      innerRing.rotation.z = -t * 0.3;
-
-      renderer.render(scene, camera);
-    }
-
-    // ── Resize ─────────────────────────────────────────────
-
-    function onResize() {
-      var w = window.innerWidth;
-      var h = window.innerHeight;
-      renderer.setSize(w, h);
-
-      var aspect = w / h;
-      var viewSize = 5;
-
-      camera.left = -viewSize * aspect;
-      camera.right = viewSize * aspect;
-      camera.top = viewSize;
-      camera.bottom = -viewSize;
-      camera.near = -10;
-      camera.far = 10;
-      camera.updateProjectionMatrix();
-    }
-
-    window.addEventListener('resize', onResize);
-    onResize();
-    animate();
-  </script>
+    </g><!-- end .rotating -->
+  </svg>
 </body>
 </html>
