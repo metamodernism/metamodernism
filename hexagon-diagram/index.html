@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hexagon Diagram</title>
+  <style>
+    @font-face {
+      font-family: 'Geist';
+      src: url('https://cdn.jsdelivr.net/npm/geist@1.2.2/dist/fonts/geist-sans/Geist-Regular.woff2') format('woff2');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'Geist';
+      src: url('https://cdn.jsdelivr.net/npm/geist@1.2.2/dist/fonts/geist-sans/Geist-Light.woff2') format('woff2');
+      font-weight: 300;
+    }
+    @font-face {
+      font-family: 'GT America Mono';
+      src: url('https://cdn.jsdelivr.net/npm/gt-america-mono@0.1.0/GT-America-Mono-Regular.woff2') format('woff2');
+      font-weight: 400;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Geist', 'Helvetica Neue', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script>
+    // ── Setup ──────────────────────────────────────────────
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.OrthographicCamera();
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // ── Constants ──────────────────────────────────────────
+    const OUTER_RADIUS = 3.2;
+    const INNER_RADIUS = 1.8;
+    const CENTER_RADIUS = 0.35;
+    const NUM_VERTICES = 6;
+    const NUM_AXES = 5;
+    const DASH_SCALE = 0.08;
+    const DOT_GAP = 0.12;
+    const LINE_COLOR = 0xffffff;
+    const DIM_COLOR = 0x444444;
+
+    // ── Helpers ────────────────────────────────────────────
+
+    function hexagonVertices(radius, count) {
+      count = count || NUM_VERTICES;
+      var verts = [];
+      for (var i = 0; i < count; i++) {
+        var angle = (Math.PI / 3) * i - Math.PI / 6;
+        verts.push(new THREE.Vector3(
+          Math.cos(angle) * radius,
+          Math.sin(angle) * radius,
+          0
+        ));
+      }
+      return verts;
+    }
+
+    function createDottedLoop(vertices, color, dashSize, gapSize) {
+      var points = vertices.concat([vertices[0]]);
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      var distances = [0];
+      for (var i = 1; i < points.length; i++) {
+        distances.push(distances[i - 1] + points[i].distanceTo(points[i - 1]));
+      }
+      geometry.setAttribute(
+        'lineDistance',
+        new THREE.Float32BufferAttribute(distances, 1)
+      );
+
+      var material = new THREE.LineDashedMaterial({
+        color: color,
+        dashSize: dashSize,
+        gapSize: gapSize,
+        transparent: true,
+        opacity: 1.0,
+      });
+
+      var line = new THREE.Line(geometry, material);
+      line.computeLineDistances();
+      return line;
+    }
+
+    function createCircle(radius, segments, color, dashed) {
+      var points = [];
+      for (var i = 0; i <= segments; i++) {
+        var a = (i / segments) * Math.PI * 2;
+        points.push(new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0));
+      }
+
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      if (dashed) {
+        var distances = [0];
+        for (var i = 1; i < points.length; i++) {
+          distances.push(distances[i - 1] + points[i].distanceTo(points[i - 1]));
+        }
+        geometry.setAttribute('lineDistance', new THREE.Float32BufferAttribute(distances, 1));
+
+        var material = new THREE.LineDashedMaterial({
+          color: color,
+          dashSize: 0.04,
+          gapSize: 0.06,
+          transparent: true,
+          opacity: 0.7,
+        });
+        var line = new THREE.Line(geometry, material);
+        line.computeLineDistances();
+        return line;
+      }
+
+      var material = new THREE.LineBasicMaterial({ color: color, transparent: true, opacity: 0.9 });
+      return new THREE.Line(geometry, material);
+    }
+
+    function createSpline(start, end, color, opacity) {
+      opacity = opacity || 0.5;
+      var mid = new THREE.Vector3()
+        .addVectors(start, end)
+        .multiplyScalar(0.5);
+
+      var pull = 0.35;
+      mid.multiplyScalar(1 - pull);
+
+      var curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+      var points = curve.getPoints(48);
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      var material = new THREE.LineBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: opacity,
+      });
+
+      return new THREE.Line(geometry, material);
+    }
+
+    // ── Build Scene ────────────────────────────────────────
+
+    var diagramGroup = new THREE.Group();
+    scene.add(diagramGroup);
+
+    // Outer hexagon (dotted)
+    var outerVerts = hexagonVertices(OUTER_RADIUS);
+    var outerHex = createDottedLoop(outerVerts, LINE_COLOR, DASH_SCALE, DOT_GAP);
+    diagramGroup.add(outerHex);
+
+    // Inner hexagon (dotted, subtler)
+    var innerVerts = hexagonVertices(INNER_RADIUS);
+    var innerHex = createDottedLoop(innerVerts, LINE_COLOR, DASH_SCALE * 0.7, DOT_GAP * 0.8);
+    innerHex.material.opacity = 0.45;
+    diagramGroup.add(innerHex);
+
+    // Five axis lines
+    var axisLines = [];
+    for (var i = 0; i < NUM_AXES; i++) {
+      var from = outerVerts[i];
+      var oppIdx = (i + 3) % NUM_VERTICES;
+      var to = outerVerts[oppIdx];
+
+      var points = [from, to];
+      var geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+      var distances = [0, from.distanceTo(to)];
+      geometry.setAttribute('lineDistance', new THREE.Float32BufferAttribute(distances, 1));
+
+      var material = new THREE.LineDashedMaterial({
+        color: DIM_COLOR,
+        dashSize: 0.05,
+        gapSize: 0.08,
+        transparent: true,
+        opacity: 0.3,
+      });
+
+      var line = new THREE.Line(geometry, material);
+      line.computeLineDistances();
+      axisLines.push(line);
+      diagramGroup.add(line);
+    }
+
+    // Internal splines
+    var splines = [];
+    for (var i = 0; i < NUM_AXES; i++) {
+      var a = innerVerts[i];
+      var b = innerVerts[(i + 2) % NUM_VERTICES];
+      var spline = createSpline(a, b, LINE_COLOR, 0.25);
+      splines.push(spline);
+      diagramGroup.add(spline);
+    }
+
+    // Additional cross-splines
+    for (var i = 0; i < NUM_AXES; i++) {
+      var a = innerVerts[i];
+      var b = innerVerts[(i + 3) % NUM_VERTICES];
+      var spline = createSpline(a, b, LINE_COLOR, 0.15);
+      splines.push(spline);
+      diagramGroup.add(spline);
+    }
+
+    // Central circle
+    var centerCircle = createCircle(CENTER_RADIUS, 64, LINE_COLOR, false);
+    diagramGroup.add(centerCircle);
+
+    // Smaller inner ring (dashed)
+    var innerRing = createCircle(CENTER_RADIUS * 0.55, 48, LINE_COLOR, true);
+    diagramGroup.add(innerRing);
+
+    // Vertex dots on outer hexagon
+    var dotGeometry = new THREE.CircleGeometry(0.045, 16);
+    var dotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR });
+    outerVerts.forEach(function(v) {
+      var dot = new THREE.Mesh(dotGeometry, dotMaterial);
+      dot.position.copy(v);
+      diagramGroup.add(dot);
+    });
+
+    // Vertex dots on inner hexagon (smaller)
+    var smallDotGeometry = new THREE.CircleGeometry(0.03, 16);
+    var smallDotMaterial = new THREE.MeshBasicMaterial({ color: LINE_COLOR, transparent: true, opacity: 0.6 });
+    innerVerts.forEach(function(v) {
+      var dot = new THREE.Mesh(smallDotGeometry, smallDotMaterial);
+      dot.position.copy(v);
+      diagramGroup.add(dot);
+    });
+
+    // Center dot
+    var centerDot = new THREE.Mesh(
+      new THREE.CircleGeometry(0.06, 24),
+      new THREE.MeshBasicMaterial({ color: LINE_COLOR })
+    );
+    diagramGroup.add(centerDot);
+
+    // ── Animation ──────────────────────────────────────────
+
+    var clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      var t = clock.getElapsedTime();
+
+      diagramGroup.rotation.z = Math.sin(t * 0.15) * 0.04;
+
+      outerHex.material.opacity = 0.7 + Math.sin(t * 0.8) * 0.3;
+
+      var innerScale = 1.0 + Math.sin(t * 0.6) * 0.02;
+      innerHex.scale.set(innerScale, innerScale, 1);
+      innerHex.material.opacity = 0.35 + Math.sin(t * 0.5 + 1) * 0.15;
+
+      splines.forEach(function(spline, i) {
+        var phase = (i / splines.length) * Math.PI * 2;
+        spline.material.opacity = 0.12 + Math.sin(t * 0.7 + phase) * 0.12;
+      });
+
+      axisLines.forEach(function(line, i) {
+        var phase = (i / axisLines.length) * Math.PI * 2;
+        line.material.opacity = 0.2 + Math.sin(t * 0.4 + phase) * 0.12;
+      });
+
+      var cScale = 1.0 + Math.sin(t * 1.0) * 0.03;
+      centerCircle.scale.set(cScale, cScale, 1);
+      centerCircle.material.opacity = 0.7 + Math.sin(t * 1.2) * 0.3;
+
+      innerRing.rotation.z = -t * 0.3;
+
+      renderer.render(scene, camera);
+    }
+
+    // ── Resize ─────────────────────────────────────────────
+
+    function onResize() {
+      var w = window.innerWidth;
+      var h = window.innerHeight;
+      renderer.setSize(w, h);
+
+      var aspect = w / h;
+      var viewSize = 5;
+
+      camera.left = -viewSize * aspect;
+      camera.right = viewSize * aspect;
+      camera.top = viewSize;
+      camera.bottom = -viewSize;
+      camera.near = -10;
+      camera.far = 10;
+      camera.updateProjectionMatrix();
+    }
+
+    window.addEventListener('resize', onResize);
+    onResize();
+    animate();
+  </script>
+</body>
+</html>
