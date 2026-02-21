@@ -6,6 +6,16 @@
   <title>Metamodernism Diagram — Animated</title>
   <style>
     @font-face {
+      font-family: 'GT America Mono';
+      src: local('GT America Mono'), local('GTAmericaMono-Regular');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'GT America Mono';
+      src: local('GT America Mono Bold'), local('GTAmericaMono-Bold');
+      font-weight: 700;
+    }
+    @font-face {
       font-family: 'Geist';
       src: url('https://cdn.jsdelivr.net/npm/geist@1.2.2/dist/fonts/geist-sans/Geist-Regular.woff2') format('woff2');
       font-weight: 400;
@@ -38,10 +48,18 @@
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
+    @keyframes spinCCW {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
 
     .rotating {
       transform-origin: 600px 600px;
       animation: spinCW 180s linear infinite;
+    }
+
+    .counter-rotate {
+      animation: spinCCW 180s linear infinite;
     }
   </style>
 </head>
@@ -58,96 +76,116 @@
     <!-- Background -->
     <rect width="1200" height="1200" fill="#0e0e0e" />
 
-    <!-- ═══ Fixed layer: axes + corner labels ═══ -->
+    <!-- ═══ Fixed layer: corner labels only ═══ -->
 
-    <!-- Axis lines (dashed, with open-chevron arrows) -->
-    <line x1="65" y1="600" x2="1135" y2="600"
-          stroke="#fff" stroke-width="1" stroke-dasharray="8 6" opacity="0.6"
-          marker-start="url(#arrow)" marker-end="url(#arrow)" />
-    <line x1="600" y1="65" x2="600" y2="1135"
-          stroke="#fff" stroke-width="1" stroke-dasharray="8 6" opacity="0.6"
-          marker-start="url(#arrow)" marker-end="url(#arrow)" />
-
-    <!-- Corner labels (fixed) -->
     <text x="80" y="95" fill="#fff"
-          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          font-family="'GT America Mono', 'SF Mono', 'Consolas', monospace" font-size="34" font-weight="700"
           letter-spacing="3">PEOPLE</text>
     <text x="1120" y="95" fill="#fff" text-anchor="end"
-          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          font-family="'GT America Mono', 'SF Mono', 'Consolas', monospace" font-size="34" font-weight="700"
           letter-spacing="3">PLACE</text>
     <text x="80" y="1128" fill="#fff"
-          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          font-family="'GT America Mono', 'SF Mono', 'Consolas', monospace" font-size="34" font-weight="700"
           letter-spacing="3">SYMBOLS</text>
     <text x="1120" y="1128" fill="#fff" text-anchor="end"
-          font-family="Geist, Helvetica Neue, sans-serif" font-size="34" font-weight="700"
+          font-family="'GT America Mono', 'SF Mono', 'Consolas', monospace" font-size="34" font-weight="700"
           letter-spacing="3">RITUALS</text>
 
-    <!-- ═══ Rotating layer: circles + inner content ═══ -->
+    <!-- ═══ Rotating layer: axes + circles + inner content ═══ -->
     <g class="rotating">
 
-      <!-- Outer dotted circle -->
+      <!-- Axis lines (rotate with diagram) -->
+      <line x1="65" y1="600" x2="1135" y2="600"
+            stroke="#fff" stroke-width="1" stroke-dasharray="8 6" opacity="0.6"
+            marker-start="url(#arrow)" marker-end="url(#arrow)" />
+      <line x1="600" y1="65" x2="600" y2="1135"
+            stroke="#fff" stroke-width="1" stroke-dasharray="8 6" opacity="0.6"
+            marker-start="url(#arrow)" marker-end="url(#arrow)" />
+
+      <!-- Outer dotted circle (r=440) -->
       <circle cx="600" cy="600" r="440" fill="none"
               stroke="#fff" stroke-width="1.5" stroke-dasharray="2.5 6" opacity="0.7" />
 
-      <!-- Inner dashed circle -->
+      <!-- Inner dashed circle (r=280) -->
       <circle cx="600" cy="600" r="280" fill="none"
               stroke="#fff" stroke-width="1.5" stroke-dasharray="12 8" opacity="0.55" />
 
-      <!-- ─── Quadrant circles ─── -->
+      <!-- ─── Quadrant circles ───
+           Gap between perimeters = 440 − 280 = 160
+           Quadrant radius = 80, center distance from origin = 360
+           Positioned at 45° angles: offset = 360 / √2 ≈ 254.6
+           Centers: (345, 345), (855, 345), (345, 855), (855, 855)
+      -->
 
-      <!-- Top-left: Friends as Family (solid stroke) -->
-      <circle cx="370" cy="345" r="118" fill="none"
+      <!-- Top-left: Friends as Family (solid — the 1 non-dashed) -->
+      <circle cx="345" cy="345" r="80" fill="none"
               stroke="#fff" stroke-width="2" opacity="0.85" />
-      <text x="370" y="337" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Friends</text>
-      <text x="370" y="371" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">as Family</text>
+      <g class="counter-rotate" style="transform-origin: 345px 345px">
+        <text x="345" y="337" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="24" font-weight="700">Friends</text>
+        <text x="345" y="363" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="24" font-weight="700">as Family</text>
+      </g>
 
-      <!-- Top-right: Home and Away (dashed stroke) -->
-      <circle cx="830" cy="340" r="118" fill="none"
+      <!-- Top-right: Home and Away (dashed) -->
+      <circle cx="855" cy="345" r="80" fill="none"
               stroke="#fff" stroke-width="2" stroke-dasharray="10 7" opacity="0.85" />
-      <text x="830" y="332" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Home</text>
-      <text x="830" y="366" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">and Away</text>
+      <g class="counter-rotate" style="transform-origin: 855px 345px">
+        <text x="855" y="337" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="24" font-weight="700">Home</text>
+        <text x="855" y="363" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="24" font-weight="700">and Away</text>
+      </g>
 
-      <!-- Bottom-left: Cultural Feeling (dashed stroke) -->
-      <circle cx="368" cy="860" r="118" fill="none"
+      <!-- Bottom-left: Cultural Feeling (dashed) -->
+      <circle cx="345" cy="855" r="80" fill="none"
               stroke="#fff" stroke-width="2" stroke-dasharray="10 7" opacity="0.85" />
-      <text x="368" y="852" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Cultural</text>
-      <text x="368" y="886" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="30" font-weight="700">Feeling</text>
+      <g class="counter-rotate" style="transform-origin: 345px 855px">
+        <text x="345" y="847" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="24" font-weight="700">Cultural</text>
+        <text x="345" y="873" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="24" font-weight="700">Feeling</text>
+      </g>
 
-      <!-- Bottom-right: Self-Calibration (dotted stroke) -->
-      <circle cx="832" cy="865" r="112" fill="none"
-              stroke="#fff" stroke-width="2" stroke-dasharray="2.5 6" opacity="0.85" />
-      <text x="832" y="857" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="28" font-weight="700">Self-</text>
-      <text x="832" y="889" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="28" font-weight="700">Calibration</text>
+      <!-- Bottom-right: Self-Calibration (dashed — matching others) -->
+      <circle cx="855" cy="855" r="80" fill="none"
+              stroke="#fff" stroke-width="2" stroke-dasharray="10 7" opacity="0.85" />
+      <g class="counter-rotate" style="transform-origin: 855px 855px">
+        <text x="855" y="847" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Self-</text>
+        <text x="855" y="873" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Calibration</text>
+      </g>
 
-      <!-- ─── Inner quadrant labels ─── -->
+      <!-- ─── Inner quadrant labels (counter-rotated to stay readable) ─── -->
 
-      <text x="465" y="510" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Generational</text>
-      <text x="465" y="540" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">reunion</text>
+      <g class="counter-rotate" style="transform-origin: 465px 520px">
+        <text x="465" y="507" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Generational</text>
+        <text x="465" y="533" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">reunion</text>
+      </g>
 
-      <text x="735" y="510" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Ancestral</text>
-      <text x="735" y="540" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">return</text>
+      <g class="counter-rotate" style="transform-origin: 735px 520px">
+        <text x="735" y="507" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Ancestral</text>
+        <text x="735" y="533" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">return</text>
+      </g>
 
-      <text x="465" y="690" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Common</text>
-      <text x="465" y="720" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Symbols</text>
+      <g class="counter-rotate" style="transform-origin: 465px 695px">
+        <text x="465" y="682" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Common</text>
+        <text x="465" y="708" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Symbols</text>
+      </g>
 
-      <text x="735" y="690" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Responsible</text>
-      <text x="735" y="720" fill="#fff" text-anchor="middle"
-            font-family="Geist, Helvetica Neue, sans-serif" font-size="26" font-weight="700">Hosting</text>
+      <g class="counter-rotate" style="transform-origin: 735px 695px">
+        <text x="735" y="682" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Responsible</text>
+        <text x="735" y="708" fill="#fff" text-anchor="middle"
+              font-family="Geist, 'Helvetica Neue', sans-serif" font-size="22" font-weight="700">Hosting</text>
+      </g>
 
     </g><!-- end .rotating -->
   </svg>
