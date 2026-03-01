@@ -171,7 +171,7 @@ html, body {
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.75);
   line-height: 1;
   padding: 16px 6px;
   transition: color 0.2s;
@@ -184,7 +184,7 @@ html, body {
 }
 
 .nav-label[role="button"]:hover {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .nav-label--bc {
@@ -219,25 +219,45 @@ html, body {
   pointer-events: none;
 }
 
+/* Fanned deck — each card rotates from bottom-center origin,
+   progressively more angle + blur to suggest depth */
+.card-stack-item {
+  transform-origin: 50% 95%;
+}
+
 .stack-1 {
-  transform: translateY(12px) rotate(0.5deg) scale(0.98);
-  filter: blur(1px);
-  opacity: 0.6;
+  transform: rotate(1.2deg) translateY(6px);
+  filter: blur(0.5px);
+  opacity: 0.55;
   z-index: 1;
 }
 
 .stack-2 {
-  transform: translateY(26px) rotate(-0.8deg) scale(0.96);
-  filter: blur(3px);
-  opacity: 0.4;
+  transform: rotate(-1.8deg) translateY(8px);
+  filter: blur(1.5px);
+  opacity: 0.45;
   z-index: 0;
 }
 
 .stack-3 {
-  transform: translateY(42px) rotate(1deg) scale(0.93);
-  filter: blur(5px);
-  opacity: 0.25;
+  transform: rotate(3.2deg) translateY(10px);
+  filter: blur(2.5px);
+  opacity: 0.35;
   z-index: -1;
+}
+
+.stack-4 {
+  transform: rotate(-4.5deg) translateY(12px);
+  filter: blur(4px);
+  opacity: 0.22;
+  z-index: -2;
+}
+
+.stack-5 {
+  transform: rotate(6deg) translateY(14px);
+  filter: blur(5.5px);
+  opacity: 0.14;
+  z-index: -3;
 }
 
 .card {
