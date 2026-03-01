@@ -28,18 +28,23 @@
 
   <!-- Overlay: card page, slides over the top -->
   <section class="overlay">
+    <nav class="overlay-nav overlay-nav--top">
+      <span class="nav-label nav-label--tl">Insight Strategies</span>
+      <span class="nav-label nav-label--tr" role="button" tabindex="0">About</span>
+    </nav>
     <div class="card-container">
+      <div class="card-stack-item stack-3" aria-hidden="true"></div>
+      <div class="card-stack-item stack-2" aria-hidden="true"></div>
+      <div class="card-stack-item stack-1" aria-hidden="true"></div>
       <div class="card">
-        <span class="corner corner-tl">Oblique Strategies</span>
-        <span class="corner corner-tr">About</span>
-        <span class="corner corner-bl">Eno / Schmidt</span>
-        <span class="corner corner-br">Shuffle</span>
         <p class="strategy-text"></p>
       </div>
     </div>
-    <div class="drag-indicator" aria-hidden="true">
-      <span class="drag-pill"></span>
-    </div>
+    <nav class="overlay-nav overlay-nav--bottom">
+      <span class="nav-label nav-label--bl" role="button" tabindex="0">Left</span>
+      <span class="nav-label nav-label--bc" role="button" tabindex="0">Shuffle</span>
+      <span class="nav-label nav-label--br" role="button" tabindex="0">Right</span>
+    </nav>
   </section>
 
   <script src="js/app.js"></script>
