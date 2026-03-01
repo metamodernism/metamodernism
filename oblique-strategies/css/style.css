@@ -121,16 +121,76 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  will-change: transform;
+  will-change: transform, border-radius;
   touch-action: none;
+  border-radius: 0;
+  transition: border-radius 0.3s ease;
+}
+
+.overlay.dragging {
+  border-radius: 0 0 20px 20px;
 }
 
 .overlay.transitioning {
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .overlay.revealed {
   transform: translateY(-100%);
+  border-radius: 0 0 20px 20px;
+}
+
+/* ==========================================================
+   OVERLAY NAV — labels on the dark background
+   ========================================================== */
+.overlay-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  z-index: 20;
+}
+
+.overlay-nav--top {
+  top: 0;
+  padding-top: max(env(safe-area-inset-top, 16px), 16px);
+  justify-content: space-between;
+}
+
+.overlay-nav--bottom {
+  bottom: 0;
+  padding-bottom: max(env(safe-area-inset-bottom, 18px), 18px);
+  justify-content: space-between;
+}
+
+.nav-label {
+  font-family: "GT America Mono", "SF Mono", "Cascadia Code", "Courier New", monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1;
+  padding: 16px 4px;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.nav-label[role="button"] {
+  cursor: pointer;
+}
+
+.nav-label[role="button"]:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.nav-label--bc {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* ==========================================================
@@ -258,46 +318,6 @@ html, body {
   background-position: 100% 100%;
 }
 
-/* ==========================================================
-   CORNER LABELS
-   ========================================================== */
-.corner {
-  position: absolute;
-  z-index: 2;
-  font-family: "GT America Mono", "SF Mono", "Cascadia Code", "Courier New", monospace;
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(0, 0, 0, 0.28);
-  transition: color 0.2s;
-  line-height: 1;
-}
-
-.corner:hover {
-  color: rgba(0, 0, 0, 0.55);
-}
-
-.corner-tl {
-  top: 20px;
-  left: 22px;
-}
-
-.corner-tr {
-  top: 20px;
-  right: 22px;
-  cursor: pointer;
-}
-
-.corner-bl {
-  bottom: 20px;
-  left: 22px;
-}
-
-.corner-br {
-  bottom: 20px;
-  right: 22px;
-  cursor: pointer;
-}
 
 /* ==========================================================
    CARD ANIMATIONS — smooth crossfade-style transition
@@ -335,32 +355,6 @@ html, body {
   animation: card-enter 0.45s cubic-bezier(0.0, 0, 0.2, 1) forwards;
 }
 
-/* ==========================================================
-   DRAG INDICATOR
-   ========================================================== */
-.drag-indicator {
-  position: absolute;
-  bottom: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.drag-pill {
-  display: block;
-  width: 36px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.2);
-  animation: pulse-hint 3s ease-in-out infinite;
-}
-
-@keyframes pulse-hint {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 0.45; }
-}
 
 /* ==========================================================
    RESPONSIVE
@@ -375,14 +369,14 @@ html, body {
     width: clamp(260px, 80vw, 340px);
   }
 
-  .corner {
-    font-size: 0.48rem;
+  .overlay-nav {
+    padding: 0 16px;
   }
 
-  .corner-tl { top: 16px; left: 16px; }
-  .corner-tr { top: 16px; right: 16px; }
-  .corner-bl { bottom: 16px; left: 16px; }
-  .corner-br { bottom: 16px; right: 16px; }
+  .nav-label {
+    font-size: 0.52rem;
+    padding: 14px 4px;
+  }
 
   .underlay-content {
     padding: 1.5rem;

@@ -140,7 +140,8 @@ const strategies = [
 ];
 
 // --- State ---
-let recentIndices = [];
+let history = [];       // cards we've seen (strategy strings)
+let historyPos = -1;    // current position in history
 let isAnimating = false;
 
 // --- DOM ---
@@ -148,39 +149,34 @@ const card = document.querySelector(".card");
 const strategyText = document.querySelector(".strategy-text");
 const overlay = document.querySelector(".overlay");
 const backBtn = document.querySelector(".back-btn");
-const cornerAbout = document.querySelector(".corner-tr");
-const cornerShuffle = document.querySelector(".corner-br");
+const navAbout = document.querySelector(".nav-label--tr");
+const navLeft = document.querySelector(".nav-label--bl");
+const navShuffle = document.querySelector(".nav-label--bc");
+const navRight = document.querySelector(".nav-label--br");
 
 // --- Pick a random strategy (avoid recent repeats) ---
 function pickStrategy() {
-  const maxRecent = Math.min(20, Math.floor(strategies.length / 2));
-  let idx;
+  const recentCount = Math.min(20, Math.floor(strategies.length / 2));
+  const recent = history.slice(-recentCount);
+  let text;
   do {
-    idx = Math.floor(Math.random() * strategies.length);
-  } while (recentIndices.includes(idx));
-
-  recentIndices.push(idx);
-  if (recentIndices.length > maxRecent) {
-    recentIndices.shift();
-  }
-  return strategies[idx];
+    text = strategies[Math.floor(Math.random() * strategies.length)];
+  } while (recent.includes(text) && strategies.length > recentCount);
+  return text;
 }
 
-// --- Display a new card with animation ---
-function shuffleCard() {
+// --- Animate card transition ---
+function transitionCard(newText) {
   if (isAnimating) return;
   isAnimating = true;
 
-  // Exit animation
   card.classList.add("exiting");
 
   card.addEventListener("animationend", function onExit() {
     card.removeEventListener("animationend", onExit);
 
-    // Swap text while invisible
-    strategyText.textContent = pickStrategy();
+    strategyText.textContent = newText;
 
-    // Enter animation
     card.classList.remove("exiting");
     card.classList.add("entering");
 
@@ -192,26 +188,73 @@ function shuffleCard() {
   });
 }
 
-// --- Initial card ---
-strategyText.textContent = pickStrategy();
+// --- Navigation ---
+function goRight() {
+  if (historyPos < history.length - 1) {
+    // Move forward through history
+    historyPos++;
+    transitionCard(history[historyPos]);
+  } else {
+    // Draw new card
+    var text = pickStrategy();
+    history.push(text);
+    historyPos = history.length - 1;
+    transitionCard(text);
+  }
+}
 
-// --- Click / tap to shuffle ---
-card.addEventListener("click", function (e) {
-  // Don't shuffle if clicking the About corner
-  if (e.target === cornerAbout) return;
-  shuffleCard();
+function goLeft() {
+  if (historyPos > 0) {
+    historyPos--;
+    transitionCard(history[historyPos]);
+  }
+}
+
+function shuffleCard() {
+  var text = pickStrategy();
+  // Truncate forward history, add new card
+  history = history.slice(0, historyPos + 1);
+  history.push(text);
+  historyPos = history.length - 1;
+  transitionCard(text);
+}
+
+// --- Initial card ---
+(function init() {
+  var text = pickStrategy();
+  history.push(text);
+  historyPos = 0;
+  strategyText.textContent = text;
+})();
+
+// --- Click / tap card to go right ---
+card.addEventListener("click", function () {
+  goRight();
 });
 
-// --- Keyboard: any key shuffles ---
+// --- Keyboard ---
 document.addEventListener("keydown", function (e) {
-  if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") {
+  if (e.key === "ArrowLeft") {
     e.preventDefault();
-    shuffleCard();
+    goLeft();
+  } else if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") {
+    e.preventDefault();
+    goRight();
   }
 });
 
-// --- Corner: Shuffle ---
-cornerShuffle.addEventListener("click", function (e) {
+// --- Nav buttons ---
+navRight.addEventListener("click", function (e) {
+  e.stopPropagation();
+  goRight();
+});
+
+navLeft.addEventListener("click", function (e) {
+  e.stopPropagation();
+  goLeft();
+});
+
+navShuffle.addEventListener("click", function (e) {
   e.stopPropagation();
   shuffleCard();
 });
@@ -229,6 +272,7 @@ let overlayRevealed = false;
 function showUnderlay() {
   overlayRevealed = true;
   overlay.style.transform = "";
+  overlay.classList.remove("dragging");
   overlay.classList.add("transitioning", "revealed");
 }
 
@@ -237,7 +281,6 @@ function hideUnderlay() {
   overlay.classList.add("transitioning");
   overlay.classList.remove("revealed");
   overlay.style.transform = "";
-  // Clean up transitioning class after animation
   overlay.addEventListener("transitionend", function onEnd() {
     overlay.removeEventListener("transitionend", onEnd);
     overlay.classList.remove("transitioning");
@@ -245,6 +288,7 @@ function hideUnderlay() {
 }
 
 function snapBack() {
+  overlay.classList.remove("dragging");
   overlay.classList.add("transitioning");
   overlay.style.transform = "translateY(0)";
   overlay.addEventListener("transitionend", function onEnd() {
@@ -257,8 +301,8 @@ function snapBack() {
 // Pointer events for drag
 overlay.addEventListener("pointerdown", function (e) {
   if (overlayRevealed) return;
-  // Ignore if clicking card or interactive elements
   if (e.target.closest(".card")) return;
+  if (e.target.closest(".nav-label")) return;
 
   isDragging = true;
   pointerStartY = e.clientY;
@@ -271,23 +315,26 @@ overlay.addEventListener("pointerdown", function (e) {
 overlay.addEventListener("pointermove", function (e) {
   if (!isDragging) return;
 
-  const deltaY = e.clientY - pointerStartY;
-  // Only allow upward drag (negative)
+  var deltaY = e.clientY - pointerStartY;
   if (deltaY < 0) {
     currentTranslateY = deltaY;
     overlay.style.transform = "translateY(" + deltaY + "px)";
+    // Add rounded corners while dragging
+    if (!overlay.classList.contains("dragging")) {
+      overlay.classList.add("dragging");
+    }
   }
 });
 
-overlay.addEventListener("pointerup", function (e) {
+overlay.addEventListener("pointerup", function () {
   if (!isDragging) return;
   isDragging = false;
 
-  const deltaY = currentTranslateY;
-  const elapsed = Date.now() - pointerStartTime;
-  const velocity = Math.abs(deltaY) / elapsed; // px/ms
+  var deltaY = currentTranslateY;
+  var elapsed = Date.now() - pointerStartTime;
+  var velocity = Math.abs(deltaY) / elapsed;
 
-  const threshold = window.innerHeight * 0.2;
+  var threshold = window.innerHeight * 0.2;
 
   if (Math.abs(deltaY) > threshold || velocity > 0.5) {
     showUnderlay();
@@ -302,8 +349,8 @@ overlay.addEventListener("pointercancel", function () {
   snapBack();
 });
 
-// Corner: About link
-cornerAbout.addEventListener("click", function (e) {
+// About link
+navAbout.addEventListener("click", function (e) {
   e.stopPropagation();
   showUnderlay();
 });
