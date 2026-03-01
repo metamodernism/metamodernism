@@ -260,38 +260,69 @@ navShuffle.addEventListener("click", function (e) {
 });
 
 // ==========================================================
-// SWIPE-UP TO REVEAL UNDERLAY
+// SWIPE-UP TO REVEAL UNDERLAY (parallax sheet transition)
 // ==========================================================
 
+var underlayEl = document.querySelector(".underlay");
 let pointerStartY = 0;
 let pointerStartTime = 0;
 let isDragging = false;
 let currentTranslateY = 0;
 let overlayRevealed = false;
 
+// Map drag progress (0→1) to underlay parallax
+function updateUnderlayParallax(progress) {
+  // progress: 0 = fully covered, 1 = fully revealed
+  var p = Math.max(0, Math.min(1, progress));
+  var scale = 0.92 + 0.08 * p;     // 0.92 → 1.0
+  var opacity = 0.4 + 0.6 * p;     // 0.4 → 1.0
+  underlayEl.style.transform = "scale(" + scale + ")";
+  underlayEl.style.opacity = opacity;
+}
+
+function clearUnderlayInlineStyles() {
+  underlayEl.style.transform = "";
+  underlayEl.style.opacity = "";
+}
+
 function showUnderlay() {
   overlayRevealed = true;
+  // Clear inline styles so CSS transition takes over
+  clearUnderlayInlineStyles();
   overlay.style.transform = "";
   overlay.classList.remove("dragging");
   overlay.classList.add("transitioning", "revealed");
-}
+  underlayEl.classList.add("active");
 
-function hideUnderlay() {
-  overlayRevealed = false;
-  overlay.classList.add("transitioning");
-  overlay.classList.remove("revealed");
-  overlay.style.transform = "";
-  overlay.addEventListener("transitionend", function onEnd() {
+  overlay.addEventListener("transitionend", function onEnd(e) {
+    if (e.target !== overlay) return;
     overlay.removeEventListener("transitionend", onEnd);
     overlay.classList.remove("transitioning");
   });
 }
 
+function hideUnderlay() {
+  overlayRevealed = false;
+  clearUnderlayInlineStyles();
+  underlayEl.classList.remove("active");
+  overlay.classList.add("transitioning");
+  overlay.classList.remove("revealed");
+  overlay.style.transform = "";
+
+  overlay.addEventListener("transitionend", function onEnd(e) {
+    if (e.target !== overlay) return;
+    overlay.removeEventListener("transitionend", onEnd);
+    overlay.classList.remove("transitioning", "dragging");
+  });
+}
+
 function snapBack() {
+  clearUnderlayInlineStyles();
   overlay.classList.remove("dragging");
   overlay.classList.add("transitioning");
   overlay.style.transform = "translateY(0)";
-  overlay.addEventListener("transitionend", function onEnd() {
+  overlay.addEventListener("transitionend", function onEnd(e) {
+    if (e.target !== overlay) return;
     overlay.removeEventListener("transitionend", onEnd);
     overlay.classList.remove("transitioning");
     overlay.style.transform = "";
@@ -309,6 +340,8 @@ overlay.addEventListener("pointerdown", function (e) {
   pointerStartTime = Date.now();
   currentTranslateY = 0;
   overlay.classList.remove("transitioning");
+  // Disable underlay CSS transition during drag for direct feedback
+  underlayEl.style.transition = "none";
   overlay.setPointerCapture(e.pointerId);
 });
 
@@ -319,7 +352,11 @@ overlay.addEventListener("pointermove", function (e) {
   if (deltaY < 0) {
     currentTranslateY = deltaY;
     overlay.style.transform = "translateY(" + deltaY + "px)";
-    // Add rounded corners while dragging
+
+    // Parallax: map drag distance to 0→1 progress
+    var progress = Math.abs(deltaY) / window.innerHeight;
+    updateUnderlayParallax(progress);
+
     if (!overlay.classList.contains("dragging")) {
       overlay.classList.add("dragging");
     }
@@ -329,6 +366,9 @@ overlay.addEventListener("pointermove", function (e) {
 overlay.addEventListener("pointerup", function () {
   if (!isDragging) return;
   isDragging = false;
+
+  // Re-enable CSS transition on underlay
+  underlayEl.style.transition = "";
 
   var deltaY = currentTranslateY;
   var elapsed = Date.now() - pointerStartTime;
@@ -346,6 +386,7 @@ overlay.addEventListener("pointerup", function () {
 overlay.addEventListener("pointercancel", function () {
   if (!isDragging) return;
   isDragging = false;
+  underlayEl.style.transition = "";
   snapBack();
 });
 
